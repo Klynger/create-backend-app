@@ -1,6 +1,8 @@
 import React from 'react';
+import { Container } from '@material-ui/core';
 import ApplicationBar from '../ApplicationBar';
-import { ThemeProvider, Theme, makeStyles, createMuiTheme } from '@material-ui/core/styles';
+import ProjectSpecForm from '../ProjectSpecForm';
+import { ThemeProvider, makeStyles, createMuiTheme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   contentContainer: {
@@ -14,7 +16,6 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     marginTop: 70,
-    width: '100%',
   },
   root: {
     alignItems: 'center',
@@ -37,9 +38,13 @@ function App() {
       <div className={classes.root}>
         <div className={classes.contentContainer}>
           <ApplicationBar />
-          <main className={classes.mainContainer}>
-            main container
-          </main>
+          <Container
+            maxWidth="sm"
+            component="main"
+            className={classes.mainContainer}
+          >
+            <ProjectSpecForm />
+          </Container>
         </div>
       </div>
     </ThemeProvider>

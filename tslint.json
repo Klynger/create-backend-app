@@ -6,7 +6,12 @@
     "jsRules": {},
     "rules": {
         "ordered-imports": false,
-        "quotemark": [true, "single", "jsx-double"]
+        "quotemark": [
+            true,
+            "single",
+            "jsx-double"
+        ],
+        "interface-name": false
     },
     "rulesDirectory": []
 }
