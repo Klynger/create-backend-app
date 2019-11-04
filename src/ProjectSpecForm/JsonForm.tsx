@@ -17,6 +17,9 @@ export default function JsonForm() {
       <Typography variant="h5" component="h1">
         Cole sua definição JSON
       </Typography>
+      <form>
+        <input />
+      </form>
     </section>
   );
 }

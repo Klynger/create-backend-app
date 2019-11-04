@@ -11,7 +11,9 @@
             "single",
             "jsx-double"
         ],
-        "interface-name": false
+        "interface-name": false,
+        "arrow-parens": false,
+        "object-literal-key-quotes": false
     },
     "rulesDirectory": []
 }
