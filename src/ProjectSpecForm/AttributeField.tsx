@@ -15,6 +15,7 @@ import red from '@material-ui/core/colors/red';
 
 interface Props {
   onChange: (event: React.ChangeEvent<HTMLInputElement>, name: string, type: keyof Attribute) => void;
+  onRemove: (attrFieldName: string) => void;
   values: Attribute;
   attributeFieldName: string;
 }
@@ -69,7 +70,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export default function AttributeField(props: Props) {
-  const { onChange, values, attributeFieldName } = props;
+  const { onChange, values, attributeFieldName, onRemove } = props;
   const classes = useStyles();
 
   const getChangeFn = (type: keyof Attribute) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -103,7 +104,12 @@ export default function AttributeField(props: Props) {
         />
       </div>
       <div className={classes.closeButtonContainer}>
-        <DangerIconButton size="small"><DeleteIcon /></DangerIconButton>
+        <DangerIconButton
+          size="small"
+          onClick={() => onRemove(attributeFieldName)}
+        >
+          <DeleteIcon />
+        </DangerIconButton>
       </div>
     </div>
   );

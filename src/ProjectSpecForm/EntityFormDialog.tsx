@@ -1,14 +1,14 @@
 import { useFormik } from 'formik';
+import AttributeField from './AttributeField';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-import { ApiActions, EntityForm, Attribute } from 'Entity';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles, Theme } from '@material-ui/core';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { ApiActions, EntityForm, Attribute } from 'Entity';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import React, { useState, useCallback, ChangeEvent } from 'react';
-import AttributeField from './AttributeField';
 
 interface AttributeFieldsNames {
   fieldName: string;
@@ -66,13 +66,11 @@ function useNames(indexName: number): AttributeFieldsNames {
   return getNames();
 }
 
-function getDefaultAttributeFieldsValues(attributeFieldNames: AttributeFieldsNames): Record<string, string | boolean> {
-  const { fieldName, fieldType, fieldRequired } = attributeFieldNames;
-
+function getDefaultAttributeFieldsValues(): Attribute {
   return {
-    [fieldName]: '',
-    [fieldType]: '',
-    [fieldRequired]: false,
+    name: '',
+    required: false,
+    type: '',
   };
 }
 
@@ -100,10 +98,21 @@ export default function EntityFormDialog(props: Props) {
     fieldIndex++;
     const newAttributes = {
       ...attributes,
-      [fieldName]: getDefaultAttributeFieldsValues(newAttributeFieldNames),
+      [fieldName]: getDefaultAttributeFieldsValues(),
     };
     setAttributesNames(attributesNames.concat([fieldName]));
     setFieldValue('attributes', newAttributes);
+  };
+
+  const handleRemoveAttribute = (attrFieldName: string) => {
+    const { attributes } = values;
+    const newAttributeNames = attributesNames
+      .filter((fieldName: string) => fieldName !== attrFieldName);
+    const newAttributes = newAttributeNames
+      .reduce((acc, curField) => ({ ...acc, [curField]: attributes[curField] }), {});
+
+    setFieldValue('attributes', newAttributes);
+    setAttributesNames(newAttributeNames);
   };
 
   const handleAttributeChange = (e: ChangeEvent<HTMLInputElement>, name: string, type: keyof Attribute) => {
@@ -133,11 +142,13 @@ export default function EntityFormDialog(props: Props) {
             value={values.name}
             className={classes.row}
             onChange={handleChange}
+            label="Nome da entidade"
           />
           {attributesNames.map((name: string) => (
             <AttributeField
               key={name}
               attributeFieldName={name}
+              onRemove={handleRemoveAttribute}
               onChange={handleAttributeChange}
               values={values.attributes[name]}
             />
