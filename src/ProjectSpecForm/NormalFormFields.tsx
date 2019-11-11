@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { ProjectSpecification } from 'Entity';
+import Entities from './Entities';
 import { useFormik } from 'formik';
+import React, { useState } from 'react';
 import LayersFields from './LayersFields';
-import { makeStyles, TextField, MenuItem, Theme } from '@material-ui/core';
 import EntityFormDialog from './EntityFormDialog';
+import { ENTITIES, MODULES_LIST } from './__mocks__';
+import { ProjectSpecification, SubmittedEntity, ModuleType } from 'Entity';
+import { makeStyles, TextField, MenuItem, Theme, Button } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) => ({
   flexRow: {
@@ -25,13 +27,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export default function NormalFormFields() {
   const classes = useStyles();
-  const [entityDialogOpen, setEntityDialogOpen] = useState(true);
-  const { handleSubmit, handleChange, values } = useFormik<ProjectSpecification>({
+  const [entityDialogOpen, setEntityDialogOpen] = useState(false);
+  const { handleSubmit, handleChange, values, setFieldValue } = useFormik<ProjectSpecification>({
     initialValues: {
       controllers: true,
-      entities: [],
+      entities: ENTITIES,
       generator: '',
       models: true,
+      modules: true,
+      modulesList: MODULES_LIST,
       projectName: '',
       repositories: true,
       services: true,
@@ -40,6 +44,21 @@ export default function NormalFormFields() {
       console.log({ submitValues });
     },
   });
+
+  const handleAddEntity = (entity: SubmittedEntity) => {
+    const { entities } = values;
+    setFieldValue('entities', entities.concat([entity]));
+  };
+
+  const handleRemoveEntity = (entityName: string) => {
+    const { entities } = values;
+    setFieldValue('entities', entities.filter((entity: SubmittedEntity) => entity.name !== entityName));
+  };
+
+  const handleRemoveModule = (entityName: string) => {
+    const { modulesList } = values;
+    setFieldValue('modulesList', modulesList.filter((mod: ModuleType) => mod.entityName !== entityName));
+  };
 
   return (
     <>
@@ -66,12 +85,25 @@ export default function NormalFormFields() {
         <LayersFields
           models={values.models}
           onChange={handleChange}
+          modules={values.modules}
           services={values.services}
           controllers={values.controllers}
+          modulesList={values.modulesList}
           repositories={values.repositories}
+          onRemoveModule={handleRemoveModule}
         />
+        <Entities
+          entities={values.entities}
+          onAddEntityClick={() => setEntityDialogOpen(true)}
+          onRemoveEntity={handleRemoveEntity}
+        />
+        <Button variant="contained" color="primary">Gerar Projeto</Button>
       </form>
-      <EntityFormDialog open={entityDialogOpen} onClose={() => setEntityDialogOpen(false)} />
+      <EntityFormDialog
+        open={entityDialogOpen}
+        onAddEntity={handleAddEntity}
+        onClose={() => setEntityDialogOpen(false)}
+      />
     </>
   );
 }

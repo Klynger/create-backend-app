@@ -1,5 +1,5 @@
 import React from 'react';
-import { Attribute } from 'Entity';
+import { AttributeForm } from 'Entity';
 import DeleteIcon from '@material-ui/icons/Close';
 import {
   Theme,
@@ -14,9 +14,9 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 import red from '@material-ui/core/colors/red';
 
 interface Props {
-  onChange: (event: React.ChangeEvent<HTMLInputElement>, name: string, type: keyof Attribute) => void;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>, name: string, type: keyof AttributeForm) => void;
   onRemove: (attrFieldName: string) => void;
-  values: Attribute;
+  values: AttributeForm;
   attributeFieldName: string;
 }
 
@@ -73,7 +73,7 @@ export default function AttributeField(props: Props) {
   const { onChange, values, attributeFieldName, onRemove } = props;
   const classes = useStyles();
 
-  const getChangeFn = (type: keyof Attribute) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const getChangeFn = (type: keyof AttributeForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
     onChange(e, attributeFieldName, type);
 
   return (

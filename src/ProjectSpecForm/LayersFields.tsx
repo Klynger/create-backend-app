@@ -1,4 +1,6 @@
 import React from 'react';
+import Modules from './Modules';
+import { ModuleType } from 'Entity';
 import { makeStyles, FormControlLabel, Checkbox, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -12,11 +14,13 @@ const useStyles = makeStyles({
 });
 
 interface Props {
-  // modules: boolean;
-  controllers: boolean;
-  services: boolean;
-  repositories: boolean;
   models: boolean;
+  modules: boolean;
+  services: boolean;
+  controllers: boolean;
+  repositories: boolean;
+  modulesList: ModuleType[];
+  onRemoveModule: (entityName: string) => void;
   onChange: (eventOrPath: string | React.ChangeEvent<any>) =>
     void | ((eventOrTextValue: string | React.ChangeEvent<any>) => void);
 }
@@ -24,11 +28,13 @@ interface Props {
 export default function LayersFields(props: Props) {
   const {
     models,
+    modules,
     onChange,
-    // modules,
     services,
     controllers,
+    modulesList,
     repositories,
+    onRemoveModule,
   } = props;
 
   const classes = useStyles();
@@ -36,6 +42,11 @@ export default function LayersFields(props: Props) {
   return (
     <div className={classes.root}>
       <Typography component="h2" variant="h6">Camadas</Typography>
+      <Modules
+        modules={modules}
+        modulesList={modulesList}
+        onRemoveModule={onRemoveModule}
+      />
       <div className={classes.checkboxesContainer}>
         <FormControlLabel
           label="Controllers"

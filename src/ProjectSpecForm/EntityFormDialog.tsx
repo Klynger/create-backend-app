@@ -5,10 +5,10 @@ import Dialog from '@material-ui/core/Dialog';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles, Theme } from '@material-ui/core';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { ApiActions, EntityForm, Attribute } from 'Entity';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import React, { useState, useCallback, ChangeEvent } from 'react';
+import { ApiActions, EntityForm, SubmittedEntity, AttributeForm } from 'Entity';
 
 interface AttributeFieldsNames {
   fieldName: string;
@@ -18,7 +18,8 @@ interface AttributeFieldsNames {
 
 interface Props {
   open: boolean;
-  onClose?: () => void;
+  onClose: () => void;
+  onAddEntity: (entity: SubmittedEntity) => void;
 }
 
 function getDefaultApiActions(): ApiActions {
@@ -66,7 +67,7 @@ function useNames(indexName: number): AttributeFieldsNames {
   return getNames();
 }
 
-function getDefaultAttributeFieldsValues(): Attribute {
+function getDefaultAttributeFieldsValues(): AttributeForm {
   return {
     name: '',
     required: false,
@@ -77,7 +78,7 @@ function getDefaultAttributeFieldsValues(): Attribute {
 let fieldIndex = 0;
 
 export default function EntityFormDialog(props: Props) {
-  const { open, onClose } = props;
+  const { open, onClose, onAddEntity } = props;
   const [attributesNames, setAttributesNames] = useState<string[]>([]);
   const classes = useStyles();
   const { values, handleChange, handleSubmit, setFieldValue } = useFormik<EntityForm>({
@@ -87,7 +88,24 @@ export default function EntityFormDialog(props: Props) {
       name: '',
     },
     onSubmit: submitValues => {
-      console.log({ submitValues });
+      const { apiActions, attributes: attributesForm, name } = submitValues;
+
+      const attributes = Object.keys(attributesForm).reduce((acc, cur) => ({
+        [attributesForm[cur].name]: {
+          required: attributesForm[cur].required,
+          type: attributesForm[cur].type,
+        },
+        ...acc,
+      }), {});
+
+      const entity = {
+        apiActions,
+        attributes,
+        name,
+      };
+
+      onAddEntity(entity);
+      onClose();
     },
   });
   const newAttributeFieldNames = useNames(fieldIndex);
@@ -115,7 +133,7 @@ export default function EntityFormDialog(props: Props) {
     setAttributesNames(newAttributeNames);
   };
 
-  const handleAttributeChange = (e: ChangeEvent<HTMLInputElement>, name: string, type: keyof Attribute) => {
+  const handleAttributeChange = (e: ChangeEvent<HTMLInputElement>, name: string, type: keyof AttributeForm) => {
     const { attributes } = values;
     const newAttributes = {
       ...attributes,
