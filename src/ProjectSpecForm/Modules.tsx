@@ -15,6 +15,9 @@ interface Props {
   modulesList: ModuleType[];
   onAddModule: (mod: ModuleType) => void;
   onRemoveModule: (entityName: string) => void;
+  onModuleCheckboxChange:
+    (eventOrPath: string | React.ChangeEvent<any>) =>
+    void | ((eventOrTextValue: string | React.ChangeEvent<any>) => void);
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -45,8 +48,9 @@ export default function Modules(props: Props) {
     modulesList,
     onAddModule,
     onRemoveModule,
+    onModuleCheckboxChange,
   } = props;
-  const [moduleDialogOpen, setModuleDialogOpen] = useState(true);
+  const [moduleDialogOpen, setModuleDialogOpen] = useState(false);
   const classes = useStyles({});
 
   return (
@@ -56,9 +60,10 @@ export default function Modules(props: Props) {
           label="Modules"
           control={
             <Checkbox
-            name="controllers"
-            value={modules}
-            checked={modules}
+              name="modules"
+              value={modules}
+              checked={modules}
+              onChange={onModuleCheckboxChange}
             />
           }
           />
@@ -73,6 +78,7 @@ export default function Modules(props: Props) {
         {modulesList.map(mod => (
           <Chip
             color="secondary"
+            disabled={!modules}
             key={mod.entityName}
             label={mod.entityName}
             className={classes.chipRoot}

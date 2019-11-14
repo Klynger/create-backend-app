@@ -49,12 +49,18 @@ export default function LayersFields(props: Props) {
         modulesList={modulesList}
         onAddModule={onAddModule}
         onRemoveModule={onRemoveModule}
+        onModuleCheckboxChange={onChange}
       />
       <div className={classes.checkboxesContainer}>
         <FormControlLabel
           label="Controllers"
           control={
-            <Checkbox checked={controllers} value={controllers} name="controllers" onChange={onChange} />
+            <Checkbox
+              name="controllers"
+              onChange={onChange}
+              value={controllers}
+              checked={controllers}
+            />
           }
         />
         <FormControlLabel

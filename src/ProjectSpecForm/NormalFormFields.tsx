@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import LayersFields from './LayersFields';
 import EntityFormDialog from './EntityFormDialog';
 import { ENTITIES, MODULES_LIST } from './__mocks__';
-import { ProjectSpecification, SubmittedEntity, ModuleType } from 'Entity';
+import { ProjectSpecification, SubmittedEntity, ModuleType, ProjectSpecificationJson, Entity, ApiConfig } from 'Entity';
 import { makeStyles, TextField, MenuItem, Theme, Button } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -41,7 +41,40 @@ export default function NormalFormFields() {
       services: true,
     },
     onSubmit: submitValues => {
-      console.log({ submitValues });
+      const {
+        projectName,
+        generator,
+        entities: submittedEntities,
+        controllers,
+        models,
+        modules,
+        modulesList,
+        repositories,
+        services,
+      } = submitValues;
+      const entities: Record<string, Entity> = submittedEntities.reduce((acc, { name, ...rest }) => ({
+        ...acc,
+        [name]: {
+          ...rest,
+        },
+      }), {});
+
+      const apiConfig: ApiConfig = {
+        controllers,
+        models,
+        modules: modules && modulesList.length > 0 ? modulesList : modules,
+        repositories,
+        services,
+      };
+
+      const result: ProjectSpecificationJson = {
+        apiConfig,
+        entities,
+        generator,
+        projectName,
+      };
+
+      console.log(result);
     },
   });
 
@@ -58,7 +91,7 @@ export default function NormalFormFields() {
   const handleAddModule = (mod: ModuleType) => {
     const { modulesList } = values;
     setFieldValue('modulesList', modulesList.concat([mod]));
-  };;
+  };
 
   const handleRemoveModule = (entityName: string) => {
     const { modulesList } = values;
@@ -66,50 +99,54 @@ export default function NormalFormFields() {
   };
 
   return (
-    <>
-      <form className={classes.form} onSubmit={handleSubmit}>
-        <div className={classes.flexRow}>
-          <TextField
-            name="projectName"
-            className={classes.halfSizeField}
-            label="Nome do Projeto"
-            onChange={handleChange}
-            value={values.projectName}
-          />
-          <TextField
-            select
-            onChange={handleChange}
-            value={values.generator}
-            className={classes.halfSizeField}
-            name="generator"
-            label="Gerador"
-          >
-            <MenuItem value="nest-rest-generator">nest-rest-generator</MenuItem>
-          </TextField>
-        </div>
-        <LayersFields
-          models={values.models}
+    <form className={classes.form} onSubmit={handleSubmit}>
+      <div className={classes.flexRow}>
+        <TextField
+          name="projectName"
+          className={classes.halfSizeField}
+          label="Nome do Projeto"
           onChange={handleChange}
-          modules={values.modules}
-          services={values.services}
-          onAddModule={handleAddModule}
-          controllers={values.controllers}
-          modulesList={values.modulesList}
-          repositories={values.repositories}
-          onRemoveModule={handleRemoveModule}
+          value={values.projectName}
         />
-        <Entities
-          entities={values.entities}
-          onAddEntityClick={() => setEntityDialogOpen(true)}
-          onRemoveEntity={handleRemoveEntity}
-        />
-        <Button variant="contained" color="primary">Gerar Projeto</Button>
-      </form>
+        <TextField
+          select
+          onChange={handleChange}
+          value={values.generator}
+          className={classes.halfSizeField}
+          name="generator"
+          label="Gerador"
+        >
+          <MenuItem value="nest-rest-generator">nest-rest-generator</MenuItem>
+        </TextField>
+      </div>
+      <LayersFields
+        models={values.models}
+        onChange={handleChange}
+        modules={values.modules}
+        services={values.services}
+        onAddModule={handleAddModule}
+        controllers={values.controllers}
+        modulesList={values.modulesList}
+        repositories={values.repositories}
+        onRemoveModule={handleRemoveModule}
+      />
+      <Entities
+        entities={values.entities}
+        onAddEntityClick={() => setEntityDialogOpen(true)}
+        onRemoveEntity={handleRemoveEntity}
+      />
+      <Button
+        color="primary"
+        variant="contained"
+        onClick={e => handleSubmit(e as any)}
+      >
+        Gerar Projeto
+      </Button>
       <EntityFormDialog
         open={entityDialogOpen}
         onAddEntity={handleAddEntity}
         onClose={() => setEntityDialogOpen(false)}
       />
-    </>
+    </form>
   );
 }

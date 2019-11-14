@@ -11,6 +11,21 @@ declare module 'Entity' {
     entities: SubmittedEntity[];
   }
 
+  export interface ProjectSpecificationJson {
+    projectName: string;
+    apiConfig: ApiConfig;
+    generator: string;
+    entities: Record<string, Entity>;
+  }
+
+  export interface ApiConfig {
+    models?: boolean;
+    services?: boolean;
+    controllers?: boolean;
+    repositories?: boolean;
+    modules?: boolean | ModuleType[];
+  }
+
   export interface SubmittedEntity extends Entity {
     name: string;
   }
