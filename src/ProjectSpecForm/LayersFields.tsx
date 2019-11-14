@@ -20,6 +20,7 @@ interface Props {
   controllers: boolean;
   repositories: boolean;
   modulesList: ModuleType[];
+  onAddModule: (mod: ModuleType) => void;
   onRemoveModule: (entityName: string) => void;
   onChange: (eventOrPath: string | React.ChangeEvent<any>) =>
     void | ((eventOrTextValue: string | React.ChangeEvent<any>) => void);
@@ -33,6 +34,7 @@ export default function LayersFields(props: Props) {
     services,
     controllers,
     modulesList,
+    onAddModule,
     repositories,
     onRemoveModule,
   } = props;
@@ -45,6 +47,7 @@ export default function LayersFields(props: Props) {
       <Modules
         modules={modules}
         modulesList={modulesList}
+        onAddModule={onAddModule}
         onRemoveModule={onRemoveModule}
       />
       <div className={classes.checkboxesContainer}>

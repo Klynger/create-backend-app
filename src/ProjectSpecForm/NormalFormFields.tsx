@@ -55,6 +55,11 @@ export default function NormalFormFields() {
     setFieldValue('entities', entities.filter((entity: SubmittedEntity) => entity.name !== entityName));
   };
 
+  const handleAddModule = (mod: ModuleType) => {
+    const { modulesList } = values;
+    setFieldValue('modulesList', modulesList.concat([mod]));
+  };;
+
   const handleRemoveModule = (entityName: string) => {
     const { modulesList } = values;
     setFieldValue('modulesList', modulesList.filter((mod: ModuleType) => mod.entityName !== entityName));
@@ -87,6 +92,7 @@ export default function NormalFormFields() {
           onChange={handleChange}
           modules={values.modules}
           services={values.services}
+          onAddModule={handleAddModule}
           controllers={values.controllers}
           modulesList={values.modulesList}
           repositories={values.repositories}

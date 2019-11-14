@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ModuleType } from 'Entity';
 import { makeStyles } from '@material-ui/styles';
-import { Theme, FormControlLabel, Checkbox, Button, Chip } from '@material-ui/core';
+import ModuleFormDialog from './ModuleFormDialog';
+import {
+  Chip,
+  Theme,
+  Button,
+  Checkbox,
+  FormControlLabel,
+} from '@material-ui/core';
 
 interface Props {
   modules: boolean;
   modulesList: ModuleType[];
+  onAddModule: (mod: ModuleType) => void;
   onRemoveModule: (entityName: string) => void;
 }
 
@@ -32,7 +40,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export default function Modules(props: Props) {
-  const { modules, modulesList, onRemoveModule } = props;
+  const {
+    modules,
+    modulesList,
+    onAddModule,
+    onRemoveModule,
+  } = props;
+  const [moduleDialogOpen, setModuleDialogOpen] = useState(true);
   const classes = useStyles({});
 
   return (
@@ -48,7 +62,12 @@ export default function Modules(props: Props) {
             />
           }
           />
-        <Button color="secondary">Adicionar módulo extra</Button>
+        <Button
+          color="secondary"
+          onClick={() => setModuleDialogOpen(true)}
+        >
+          Adicionar módulo extra
+        </Button>
       </div>
       <div className={classes.chipsContainer}>
         {modulesList.map(mod => (
@@ -61,6 +80,11 @@ export default function Modules(props: Props) {
           />
         ))}
       </div>
+      <ModuleFormDialog
+        open={moduleDialogOpen}
+        onAddModule={onAddModule}
+        onClose={() => setModuleDialogOpen(false)}
+      />
     </div>
   );
 }
