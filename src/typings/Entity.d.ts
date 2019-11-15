@@ -48,10 +48,8 @@ declare module 'Entity' {
     attributes: Record<string, AttributeForm>;
   }
 
-  export interface AttributeForm {
+  export interface AttributeForm extends Attribute {
     name: string;
-    required: boolean;
-    type: string;
   }
 
   export interface Attribute {

@@ -1,8 +1,7 @@
+import React from 'react';
 import Entities from './Entities';
 import { useFormik } from 'formik';
-import React, { useState } from 'react';
 import LayersFields from './LayersFields';
-import EntityFormDialog from './EntityFormDialog';
 import { ENTITIES, MODULES_LIST } from './__mocks__';
 import { ProjectSpecification, SubmittedEntity, ModuleType, ProjectSpecificationJson, Entity, ApiConfig } from 'Entity';
 import { makeStyles, TextField, MenuItem, Theme, Button } from '@material-ui/core';
@@ -27,7 +26,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export default function NormalFormFields() {
   const classes = useStyles();
-  const [entityDialogOpen, setEntityDialogOpen] = useState(false);
   const { handleSubmit, handleChange, values, setFieldValue } = useFormik<ProjectSpecification>({
     initialValues: {
       controllers: true,
@@ -81,6 +79,15 @@ export default function NormalFormFields() {
   const handleAddEntity = (entity: SubmittedEntity) => {
     const { entities } = values;
     setFieldValue('entities', entities.concat([entity]));
+  };
+
+  const handleEditEntity = (entity: SubmittedEntity, index: number) => {
+    const { entities } = values;
+    const newEntities = entities.map(
+      (ent: SubmittedEntity, i: number) => i === index ? entity : ent,
+    );
+
+    setFieldValue('entities', newEntities);
   };
 
   const handleRemoveEntity = (entityName: string) => {
@@ -142,7 +149,8 @@ export default function NormalFormFields() {
       />
       <Entities
         entities={values.entities}
-        onAddEntityClick={() => setEntityDialogOpen(true)}
+        onAddEntity={handleAddEntity}
+        onEditEntity={handleEditEntity}
         onRemoveEntity={handleRemoveEntity}
       />
       <Button
@@ -152,11 +160,6 @@ export default function NormalFormFields() {
       >
         Gerar Projeto
       </Button>
-      <EntityFormDialog
-        open={entityDialogOpen}
-        onAddEntity={handleAddEntity}
-        onClose={() => setEntityDialogOpen(false)}
-      />
     </form>
   );
 }

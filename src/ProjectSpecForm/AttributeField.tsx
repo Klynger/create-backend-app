@@ -98,6 +98,7 @@ export default function AttributeField(props: Props) {
           control={
             <Checkbox
               value={values.required}
+              checked={values.required}
               onChange={getChangeFn('required')}
             />
           }

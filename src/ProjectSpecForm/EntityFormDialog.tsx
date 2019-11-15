@@ -7,7 +7,7 @@ import { makeStyles, Theme } from '@material-ui/core';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import React, { useState, useCallback, ChangeEvent } from 'react';
+import React, { useState, useCallback, useEffect, ChangeEvent } from 'react';
 import { ApiActions, EntityForm, SubmittedEntity, AttributeForm } from 'Entity';
 
 interface AttributeFieldsNames {
@@ -19,7 +19,10 @@ interface AttributeFieldsNames {
 interface Props {
   open: boolean;
   onClose: () => void;
+  selectedEntityIndex: number;
+  selectedEntity?: SubmittedEntity;
   onAddEntity: (entity: SubmittedEntity) => void;
+  onEditEntity: (entity: SubmittedEntity, index: number) => void;
 }
 
 function getDefaultApiActions(): ApiActions {
@@ -77,16 +80,50 @@ function getDefaultAttributeFieldsValues(): AttributeForm {
 
 let fieldIndex = 0;
 
+function fromSubmittedToEntityForm(entity: SubmittedEntity): EntityForm {
+  const { apiActions, name, attributes: attrObj } = entity;
+
+  const attributes = Object.keys(attrObj)
+    .map(attrName => ({
+      name: attrName,
+      required: attrObj[attrName].required,
+      type: attrObj[attrName].type,
+    }))
+    .reduce((acc, cur) => ({ ...acc, [`fieldName${fieldIndex++}`]: cur }), {});
+
+  return {
+    apiActions,
+    attributes,
+    name,
+  };
+}
+
+const EMPTY_ENTITY = {
+  apiActions: getDefaultApiActions(),
+  attributes: {},
+  name: '',
+};
+
 export default function EntityFormDialog(props: Props) {
-  const { open, onClose, onAddEntity } = props;
+  const {
+    open,
+    onClose,
+    onAddEntity,
+    onEditEntity,
+    selectedEntity,
+    selectedEntityIndex,
+  } = props;
+  const isEditing = selectedEntityIndex !== -1;
   const [attributesNames, setAttributesNames] = useState<string[]>([]);
   const classes = useStyles();
-  const { values, handleChange, handleSubmit, setFieldValue } = useFormik<EntityForm>({
-    initialValues: {
-      apiActions: getDefaultApiActions(),
-      attributes: {},
-      name: '',
-    },
+  const {
+    values,
+    resetForm,
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+  } = useFormik<EntityForm>({
+    initialValues: selectedEntity ? fromSubmittedToEntityForm(selectedEntity) : EMPTY_ENTITY,
     onSubmit: submitValues => {
       const { apiActions, attributes: attributesForm, name } = submitValues;
 
@@ -104,11 +141,30 @@ export default function EntityFormDialog(props: Props) {
         name,
       };
 
-      onAddEntity(entity);
+      if (!isEditing) {
+        onAddEntity(entity);
+      } else {
+        onEditEntity(entity, selectedEntityIndex);
+      }
+
       onClose();
     },
   });
   const newAttributeFieldNames = useNames(fieldIndex);
+
+  useEffect(() => {
+    if (selectedEntity) {
+      const entity = fromSubmittedToEntityForm(selectedEntity);
+      resetForm({
+        values: entity,
+      });
+      setAttributesNames(Object.keys(entity.attributes));
+    } else {
+      resetForm({ values: EMPTY_ENTITY });
+      setAttributesNames(Object.keys(EMPTY_ENTITY.attributes));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEntityIndex, selectedEntity]);
 
   const handleAddNewAttribute = () => {
     const { attributes } = values;
@@ -152,7 +208,9 @@ export default function EntityFormDialog(props: Props) {
       onClose={onClose}
       aria-labelledby="entity-form-dialog-title"
     >
-      <DialogTitle id="entity-form-dialog-title">Nova Entidade</DialogTitle>
+      <DialogTitle id="entity-form-dialog-title">
+        {isEditing ? 'Editar Entidade' : 'Nova Entidade'}
+      </DialogTitle>
       <form className={classes.form} onSubmit={handleSubmit}>
         <DialogContent className={classes.dialogContent} dividers>
           <TextField
@@ -186,7 +244,7 @@ export default function EntityFormDialog(props: Props) {
             color="primary"
             onClick={e => handleSubmit(e as any)}
           >
-            Adicionar
+            {isEditing ? 'Salvar' : 'Adicionar'}
           </Button>
         </DialogActions>
       </form>
