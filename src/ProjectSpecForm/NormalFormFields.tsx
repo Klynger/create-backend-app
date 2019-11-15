@@ -1,10 +1,23 @@
 import React from 'react';
 import Entities from './Entities';
 import { useFormik } from 'formik';
+import axios from '../utils/client';
 import LayersFields from './LayersFields';
 import { ENTITIES, MODULES_LIST } from './__mocks__';
-import { ProjectSpecification, SubmittedEntity, ModuleType, ProjectSpecificationJson, Entity, ApiConfig } from 'Entity';
+import { CodeGenerator, GeneratorStatus } from '../typings';
 import { makeStyles, TextField, MenuItem, Theme, Button } from '@material-ui/core';
+import {
+  Entity,
+  ApiConfig,
+  ModuleType,
+  SubmittedEntity,
+  ProjectSpecification,
+  ProjectSpecificationJson,
+} from 'Entity';
+
+interface Props {
+  generators: CodeGenerator[];
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   flexRow: {
@@ -24,9 +37,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export default function NormalFormFields() {
+export default function NormalFormFields(props: Props) {
+  const { generators } = props;
   const classes = useStyles();
-  const { handleSubmit, handleChange, values, setFieldValue } = useFormik<ProjectSpecification>({
+  const {
+    handleSubmit,
+    handleChange,
+    values,
+    setFieldValue,
+  } = useFormik<ProjectSpecification>({
     initialValues: {
       controllers: true,
       entities: ENTITIES,
@@ -34,7 +53,7 @@ export default function NormalFormFields() {
       models: true,
       modules: true,
       modulesList: MODULES_LIST,
-      projectName: '',
+      projectName: 'MyBlog',
       repositories: true,
       services: true,
     },
@@ -65,14 +84,22 @@ export default function NormalFormFields() {
         services,
       };
 
-      const result: ProjectSpecificationJson = {
+      const specification: ProjectSpecificationJson = {
         apiConfig,
         entities,
         generator,
         projectName,
       };
 
-      console.log(result);
+      axios.post('project', specification).then(res => {
+        const { mimeType, data } = res.data;
+        const file = `data:${mimeType};base64,${data}`;
+        console.log(file);
+        const anchorEl = document.createElement('a');
+        anchorEl.setAttribute('download', projectName);
+        anchorEl.setAttribute('href', file);
+        anchorEl.click();
+      });
     },
   });
 
@@ -132,7 +159,15 @@ export default function NormalFormFields() {
           name="generator"
           label="Gerador"
         >
-          <MenuItem value="nest-rest-generator">nest-rest-generator</MenuItem>
+          {generators.map(({ appName, status }) => (
+            <MenuItem
+              key={appName}
+              value={appName}
+              disabled={status !== GeneratorStatus.NORMAL}
+            >
+              {appName}
+            </MenuItem>
+          ))}
         </TextField>
       </div>
       <LayersFields
