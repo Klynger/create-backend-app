@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ModuleType } from 'Entity';
 import { makeStyles } from '@material-ui/styles';
 import ModuleFormDialog from './ModuleFormDialog';
@@ -68,6 +68,13 @@ export default function Modules(props: Props) {
     setSelectedModuleIndex(-1);
     setDialogOpen(true);
   };
+
+  useEffect(() => {
+    if (!dialogOpen) {
+      setSelectedModuleIndex(-1);
+      setSelectedModule(undefined);
+    }
+  }, [dialogOpen]);
 
   return (
     <div className={classes.root}>
