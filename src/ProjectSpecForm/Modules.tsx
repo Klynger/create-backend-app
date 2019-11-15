@@ -15,6 +15,7 @@ interface Props {
   modulesList: ModuleType[];
   onAddModule: (mod: ModuleType) => void;
   onRemoveModule: (entityName: string) => void;
+  onEditModule: (mod: ModuleType, i: number) => void;
   onModuleCheckboxChange:
     (eventOrPath: string | React.ChangeEvent<any>) =>
     void | ((eventOrTextValue: string | React.ChangeEvent<any>) => void);
@@ -47,11 +48,26 @@ export default function Modules(props: Props) {
     modules,
     modulesList,
     onAddModule,
+    onEditModule,
     onRemoveModule,
     onModuleCheckboxChange,
   } = props;
-  const [moduleDialogOpen, setModuleDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedModule, setSelectedModule] = useState<ModuleType | undefined>();
+  const [selectedModuleIndex, setSelectedModuleIndex] = useState<number>(-1);
   const classes = useStyles({});
+
+  const handleChipClick = (mod: ModuleType, index: number) => {
+    setSelectedModule(mod);
+    setSelectedModuleIndex(index);
+    setDialogOpen(true);
+  };
+
+  const handleStartNewForm = () => {
+    setSelectedModule(undefined);
+    setSelectedModuleIndex(-1);
+    setDialogOpen(true);
+  };
 
   return (
     <div className={classes.root}>
@@ -69,27 +85,31 @@ export default function Modules(props: Props) {
           />
         <Button
           color="secondary"
-          onClick={() => setModuleDialogOpen(true)}
+          onClick={handleStartNewForm}
         >
           Adicionar módulo extra
         </Button>
       </div>
       <div className={classes.chipsContainer}>
-        {modulesList.map(mod => (
+        {modulesList.map((mod: ModuleType, i: number) => (
           <Chip
             color="secondary"
             disabled={!modules}
             key={mod.entityName}
             label={mod.entityName}
+            onClick={() => handleChipClick(mod, i)}
             className={classes.chipRoot}
             onDelete={() => onRemoveModule(mod.entityName)}
           />
         ))}
       </div>
       <ModuleFormDialog
-        open={moduleDialogOpen}
+        open={dialogOpen}
         onAddModule={onAddModule}
-        onClose={() => setModuleDialogOpen(false)}
+        onEditModule={onEditModule}
+        initialValues={selectedModule}
+        onClose={() => setDialogOpen(false)}
+        selectedModuleIndex={selectedModuleIndex}
       />
     </div>
   );

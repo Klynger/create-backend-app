@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import { ModuleType } from 'Entity';
 import {
@@ -50,28 +50,50 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   open?: boolean;
   onClose: () => void;
+  initialValues?: ModuleType;
+  selectedModuleIndex: number;
   onAddModule: (mod: ModuleType) => void;
+  onEditModule: (mod: ModuleType, i: number) => void;
 }
 
+const INITIAL_MODULE: ModuleType = {
+  entityName: '',
+  modules: [],
+};
+
 export default function ModuleFormDialog(props: Props) {
-  const { open = true, onClose, onAddModule } = props;
+  const {
+    open = true,
+    onClose,
+    onAddModule,
+    onEditModule,
+    selectedModuleIndex,
+    initialValues = INITIAL_MODULE,
+  } = props;
   const classes = useStyles();
 
   const {
     values,
+    resetForm,
     handleChange,
     handleSubmit,
     setFieldValue,
   } = useFormik<ModuleType>({
-    initialValues: {
-      entityName: 'App',
-      modules: ['User', 'Products'],
-    },
+    initialValues,
     onSubmit: (mod: ModuleType) => {
-      onAddModule(mod);
+      if (selectedModuleIndex === -1) {
+        onAddModule(mod);
+      } else {
+        onEditModule(mod, selectedModuleIndex);
+      }
       onClose();
     },
   });
+
+  useEffect(() => {
+    resetForm({ values: initialValues });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedModuleIndex, initialValues]);
 
   const handleAddNewImportValue = () => {
     setFieldValue('modules', values.modules.concat(['']));
@@ -133,7 +155,7 @@ export default function ModuleFormDialog(props: Props) {
             color="primary"
             onClick={e => handleSubmit(e as any)}
           >
-            Adicionar
+            {selectedModuleIndex !== -1 ? 'Salvar' : 'Adicionar'}
           </Button>
         </DialogActions>
       </form>

@@ -22,6 +22,7 @@ interface Props {
   modulesList: ModuleType[];
   onAddModule: (mod: ModuleType) => void;
   onRemoveModule: (entityName: string) => void;
+  onChangeModule: (mod: ModuleType, i: number) => void;
   onChange: (eventOrPath: string | React.ChangeEvent<any>) =>
     void | ((eventOrTextValue: string | React.ChangeEvent<any>) => void);
 }
@@ -36,6 +37,7 @@ export default function LayersFields(props: Props) {
     modulesList,
     onAddModule,
     repositories,
+    onChangeModule,
     onRemoveModule,
   } = props;
 
@@ -48,6 +50,7 @@ export default function LayersFields(props: Props) {
         modules={modules}
         modulesList={modulesList}
         onAddModule={onAddModule}
+        onEditModule={onChangeModule}
         onRemoveModule={onRemoveModule}
         onModuleCheckboxChange={onChange}
       />
