@@ -3,10 +3,10 @@ import AttributeField from './AttributeField';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import TextField from '@material-ui/core/TextField';
-import { makeStyles, Theme, Typography, FormHelperText } from '@material-ui/core';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
+import { makeStyles, Theme, FormHelperText } from '@material-ui/core';
 import React, { useState, useCallback, useEffect, ChangeEvent } from 'react';
 import { ApiActions, EntityForm, SubmittedEntity, AttributeForm } from 'Entity';
 
@@ -172,7 +172,7 @@ export default function EntityFormDialog(props: Props) {
       setAttributesNames(Object.keys(EMPTY_ENTITY.attributes));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedEntityIndex, selectedEntity]);
+  }, [open]);
 
   const handleAddNewAttribute = () => {
     const { attributes } = values;
@@ -238,7 +238,7 @@ export default function EntityFormDialog(props: Props) {
           />
           {attributesNames.map((name: string, i: number) => {
             const helperTextAttr = i === 0 && Boolean(values.attributes[name].name) ?
-              'Lembre-se que toda entidade deve ter um atributo id'
+              'Lembre-se que você deve delcarar um atributo id para toda entidade'
               : '';
 
             return (
