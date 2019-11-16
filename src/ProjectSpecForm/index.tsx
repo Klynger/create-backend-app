@@ -30,7 +30,7 @@ export default function ProjectSpecForm() {
           onChange={handleTabChange}
         >
           <Tab label="Formulário" />
-          <Tab label="Definição JSON" />
+          {/* <Tab label="Definição JSON" /> */}
         </Tabs>
       </Paper>
       <FormContentSwitcher showNormalForm={showNormalForm} />

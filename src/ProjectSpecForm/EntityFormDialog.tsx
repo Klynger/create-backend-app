@@ -3,7 +3,7 @@ import AttributeField from './AttributeField';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import TextField from '@material-ui/core/TextField';
-import { makeStyles, Theme } from '@material-ui/core';
+import { makeStyles, Theme, Typography, FormHelperText } from '@material-ui/core';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -38,6 +38,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   addAttributeButton: {
     marginTop: theme.spacing(1),
   },
+  attributeFieldWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  },
   dialogContent: {
     alignItems: 'flex-start',
     display: 'flex',
@@ -49,6 +54,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'column',
     minWidth: '25rem',
     width: '100%',
+  },
+  helperText: {
+    maxWidth: '21.875rem',
   },
   row: {
     display: 'flex',
@@ -202,6 +210,10 @@ export default function EntityFormDialog(props: Props) {
     setFieldValue('attributes', newAttributes);
   };
 
+  const helperText = Boolean(values.name) ?
+    'Nomes de entidades devem estar em PascalCase e nomes de atributos em camelCase'
+    : '';
+
   return (
     <Dialog
       open={open}
@@ -218,17 +230,33 @@ export default function EntityFormDialog(props: Props) {
             value={values.name}
             className={classes.row}
             onChange={handleChange}
+            helperText={helperText}
             label="Nome da entidade"
+            FormHelperTextProps={{
+              className: classes.helperText,
+            }}
           />
-          {attributesNames.map((name: string) => (
-            <AttributeField
-              key={name}
-              attributeFieldName={name}
-              onRemove={handleRemoveAttribute}
-              onChange={handleAttributeChange}
-              values={values.attributes[name]}
-            />
-          ))}
+          {attributesNames.map((name: string, i: number) => {
+            const helperTextAttr = i === 0 && Boolean(values.attributes[name].name) ?
+              'Lembre-se que toda entidade deve ter um atributo id'
+              : '';
+
+            return (
+              <div className={classes.attributeFieldWrapper} key={name}>
+                <AttributeField
+                  attributeFieldName={name}
+                  onRemove={handleRemoveAttribute}
+                  onChange={handleAttributeChange}
+                  values={values.attributes[name]}
+                />
+                {Boolean(helperTextAttr) && (
+                  <FormHelperText className={classes.helperText}>
+                    {helperTextAttr}
+                  </FormHelperText>
+                )}
+              </div>
+            );
+          })}
           <Button
             color="secondary"
             onClick={handleAddNewAttribute}

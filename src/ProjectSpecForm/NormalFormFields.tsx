@@ -3,7 +3,6 @@ import Entities from './Entities';
 import { useFormik } from 'formik';
 import axios from '../utils/client';
 import LayersFields from './LayersFields';
-import { ENTITIES, MODULES_LIST } from './__mocks__';
 import { CodeGenerator, GeneratorStatus } from '../typings';
 import { makeStyles, TextField, MenuItem, Theme, Button } from '@material-ui/core';
 import {
@@ -48,12 +47,12 @@ export default function NormalFormFields(props: Props) {
   } = useFormik<ProjectSpecification>({
     initialValues: {
       controllers: true,
-      entities: ENTITIES,
+      entities: [],
       generator: '',
       models: true,
       modules: true,
-      modulesList: MODULES_LIST,
-      projectName: 'MyBlog',
+      modulesList: [],
+      projectName: '',
       repositories: true,
       services: true,
     },
@@ -94,7 +93,6 @@ export default function NormalFormFields(props: Props) {
       axios.post('project', specification).then(res => {
         const { mimeType, data } = res.data;
         const file = `data:${mimeType};base64,${data}`;
-        console.log(file);
         const anchorEl = document.createElement('a');
         anchorEl.setAttribute('download', projectName);
         anchorEl.setAttribute('href', file);
@@ -141,6 +139,15 @@ export default function NormalFormFields(props: Props) {
     setFieldValue('modulesList', modulesList.filter((mod: ModuleType) => mod.entityName !== entityName));
   };
 
+  const generatorHelperText =
+    values.generator === 'nest-rest-generator' ?
+      'Projetos em NestJS precisam que seus módulos sejam importados em um módulo central App, você deveria criar esse módulo'
+      : '';
+
+  const projectNameHelperText =
+    Boolean(values.projectName) ?
+    'Nome do projeto e os nomes das entidades devem estar em PascalCase' : '';
+
   return (
     <form className={classes.form} onSubmit={handleSubmit}>
       <div className={classes.flexRow}>
@@ -150,6 +157,7 @@ export default function NormalFormFields(props: Props) {
           label="Nome do Projeto"
           onChange={handleChange}
           value={values.projectName}
+          helperText={projectNameHelperText}
         />
         <TextField
           select
@@ -158,6 +166,7 @@ export default function NormalFormFields(props: Props) {
           className={classes.halfSizeField}
           name="generator"
           label="Gerador"
+          helperText={generatorHelperText}
         >
           {generators.map(({ appName, status }) => (
             <MenuItem

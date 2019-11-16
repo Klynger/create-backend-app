@@ -70,7 +70,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export default function AttributeField(props: Props) {
-  const { onChange, values, attributeFieldName, onRemove } = props;
+  const {
+    values,
+    onChange,
+    onRemove,
+    attributeFieldName,
+  } = props;
   const classes = useStyles();
 
   const getChangeFn = (type: keyof AttributeForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
