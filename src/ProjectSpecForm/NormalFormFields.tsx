@@ -36,6 +36,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+function resolveAppModule(modules: boolean, modulesList: ModuleType[], entities: Record<string, Entity>) {
+  if (modules) {
+    if (!modulesList.some((mod => mod.entityName.toLowerCase() === 'app'))) {
+      modulesList = modulesList.concat([{
+        entityName: 'App',
+        modules: Object.keys(entities),
+      }]);
+    }
+    return modules && modulesList.length > 0 ? modulesList : modules;
+  }
+}
+
 export default function NormalFormFields(props: Props) {
   const { generators } = props;
   const classes = useStyles();
@@ -78,7 +90,7 @@ export default function NormalFormFields(props: Props) {
       const apiConfig: ApiConfig = {
         controllers,
         models,
-        modules: modules && modulesList.length > 0 ? modulesList : modules,
+        modules: resolveAppModule(modules, modulesList, entities),
         repositories,
         services,
       };
