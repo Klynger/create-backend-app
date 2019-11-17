@@ -1,7 +1,7 @@
 import React from 'react';
 import Modules from './Modules';
 import { ModuleType } from 'Entity';
-import { makeStyles, FormControlLabel, Checkbox, Typography } from '@material-ui/core';
+import { makeStyles, FormControlLabel, Checkbox, Typography, FormHelperText } from '@material-ui/core';
 
 const useStyles = makeStyles({
   checkboxesContainer: {
@@ -42,6 +42,8 @@ export default function LayersFields(props: Props) {
   } = props;
 
   const classes = useStyles();
+
+  const allMarked = models && modules && controllers && repositories && services;
 
   return (
     <div className={classes.root}>
@@ -85,6 +87,11 @@ export default function LayersFields(props: Props) {
           }
         />
       </div>
+      {!allMarked && (
+        <FormHelperText>
+          Se você não gerar todas a camadas não é garantido que o projeto funcione sem que você precise alterar algo
+        </FormHelperText>
+      )}
     </div>
   );
 }

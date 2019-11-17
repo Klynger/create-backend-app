@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'flex-start',
     display: 'flex',
     flexDirection: 'column',
-    maxHeight: '25rem',
+    maxHeight: '30rem',
   },
   form: {
     display: 'flex',
@@ -237,9 +237,11 @@ export default function EntityFormDialog(props: Props) {
             }}
           />
           {attributesNames.map((name: string, i: number) => {
-            const helperTextAttr = i === 0 && Boolean(values.attributes[name].name) ?
-              'Lembre-se que você deve delcarar um atributo id para toda entidade'
-              : '';
+            const shouldShowHelper = i <= 1 && Boolean(values.attributes[name].name);
+            const firstText = 'Lembre-se que você deve delcarar um atributo id para toda entidade';
+            const secondText = 'Atributos compostos devem ser representados com ids. '
+              + 'Ex: Se Pessoa tem uma lista de Produto, então produtos é do tipo string[], '
+              + 'sendo string o tipo de id da entidade Produto.';
 
             return (
               <div className={classes.attributeFieldWrapper} key={name}>
@@ -249,9 +251,9 @@ export default function EntityFormDialog(props: Props) {
                   onChange={handleAttributeChange}
                   values={values.attributes[name]}
                 />
-                {Boolean(helperTextAttr) && (
+                {shouldShowHelper && (
                   <FormHelperText className={classes.helperText}>
-                    {helperTextAttr}
+                    {i === 0 ? firstText : secondText}
                   </FormHelperText>
                 )}
               </div>
